@@ -1,0 +1,85 @@
+---
+//profile
+---
+
+<div class="container">
+  <main>
+    <div class="profile-container">
+      <h1>Profile</h1>
+      <div id="profileInfo">Loading...</div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </main>
+</div>
+
+<style>
+  .container {
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #f5f5f5;
+  }
+
+  .profile-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+
+  button {
+    padding: 0.5rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+  }
+</style>
+
+<script>
+  async function checkAuth() {
+    try {
+      const res = await fetch("http://localhost:3000/users/profile", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const data = await res.json();
+      const profileInfo = document.getElementById("profileInfo");
+      if (profileInfo) {
+        profileInfo.innerHTML = `
+          <p><strong>Username:</strong> ${data.username}</p>
+          <p><strong>First Name:</strong> ${data.firstname}</p>
+          <p><strong>Last Name:</strong> ${data.lastname}</p>
+        `;
+      }
+    } catch (err) {
+      console.error(err);
+      window.location.href = "/login";
+    }
+  }
+
+  document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    try {
+      await fetch("http://localhost:3000/users/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      window.location.href = "/login";
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  // Check authentication when page loads
+  checkAuth();
+</script>
